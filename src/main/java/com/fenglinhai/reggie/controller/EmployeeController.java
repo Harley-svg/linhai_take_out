@@ -134,7 +134,7 @@ public class EmployeeController {
 //
 //        emp.setUpdateUser(empId);
         Employee employee = employeeService.getById(emp.getId());
-        employee.setStatus(0);
+        employee.setStatus(emp.getStatus());
         employeeService.updateById(employee);
 
         long id = Thread.currentThread().getId();

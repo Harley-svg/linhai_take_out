@@ -92,6 +92,17 @@ public class SetmealController {
         return R.success("套餐已经被成功删除");
     }
 
+    @PostMapping("/status/{id}")
+    public R<String>update(@RequestParam Long ids,@PathVariable int id){
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Setmeal::getId,ids);
+        Setmeal setmeal = setmealService.getOne(queryWrapper);
+        setmeal.setStatus(id);
+        setmealService.updateById(setmeal);
+        return R.success("套餐状态1修改成功");
+
+    }
+
     @GetMapping("/list")
     public R<List<SetmealDto>>list(Setmeal setmeal){
         log.info(setmeal.toString());

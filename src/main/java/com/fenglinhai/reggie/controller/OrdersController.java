@@ -1,15 +1,14 @@
 package com.fenglinhai.reggie.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fenglinhai.reggie.common.R;
 import com.fenglinhai.reggie.entity.Orders;
 import com.fenglinhai.reggie.service.OrdersService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author Harley
@@ -30,5 +29,24 @@ public class OrdersController {
     public R<String> submit(@RequestBody Orders orders){
         ordersService.submit(orders);
         return R.success("订单提交成功耶！！");
+    }
+
+    /**
+     * 订单page展示
+     * @param page
+     * @param pageSize
+     * @param number
+     * @return
+     */
+    @GetMapping("/page")
+    public R<Page>page(int page,int pageSize,String number){
+        Page pageInfo = new Page(page, pageSize);
+        LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
+        if(number!=null){
+            queryWrapper.eq(Orders::getNumber,number);
+        }
+        queryWrapper.orderByDesc(Orders::getOrderTime);
+        Page pageReturn = ordersService.page(pageInfo, queryWrapper);
+        return R.success(pageReturn);
     }
 }
