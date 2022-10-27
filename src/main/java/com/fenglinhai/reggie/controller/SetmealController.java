@@ -16,6 +16,8 @@ import com.fenglinhai.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -37,6 +39,23 @@ public class SetmealController {
     @Autowired
     private CategoryService categoryService;
 
+    /**
+     * 获取单个setmealDto
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<SetmealDto>get(@PathVariable Long id){
+        SetmealDto setmealDto = setmealService.getByWithDishes(id);
+        return R.success(setmealDto);
+    }
+
+    /**
+     * 新增套餐
+     * @param setmealDto
+     * @return
+     */
+    @CacheEvict(value = "setmealCache",allEntries = true)
     @PostMapping
     public R<String> save(@RequestBody SetmealDto setmealDto){
         setmealService.saveWithDish(setmealDto);
@@ -85,6 +104,7 @@ public class SetmealController {
      * @param ids
      * @return
      */
+    @CacheEvict(value = "setmealCache",allEntries = true)//allEntries = true-->删除setmealCache下的所有缓存数据
     @DeleteMapping
     public R<String>delete(@RequestParam List<Long>ids){//此时要与前端的传参ids一致，如果此时为id,就无法正确带入参数
         log.info(ids.toString());
@@ -104,8 +124,9 @@ public class SetmealController {
     }
 
     @GetMapping("/list")
+    @Cacheable(value = "setmealCache",key = "#setmeal.categoryId+'_'+#setmeal.status")
     public R<List<SetmealDto>>list(Setmeal setmeal){
-        log.info(setmeal.toString());
+
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(setmeal.getCategoryId()!=null,Setmeal::getCategoryId,setmeal.getCategoryId());
         queryWrapper.orderByDesc(Setmeal::getUpdateTime);

@@ -21,6 +21,9 @@ spring:
         max-idle: 200
         min-idle: 5
     password: harley0714
+  cache:
+    redis:
+      time-to-live: 1800000 #缓存过期时间
 
 mybatis-plus:
   configuration:

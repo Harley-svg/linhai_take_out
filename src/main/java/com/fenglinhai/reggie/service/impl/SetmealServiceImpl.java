@@ -10,6 +10,7 @@ import com.fenglinhai.reggie.mapper.SetmealMapper;
 import com.fenglinhai.reggie.service.SetmealDishService;
 import com.fenglinhai.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import java.util.List;
 public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal>implements SetmealService {
     @Autowired
     private SetmealDishService setmealDishService;
+
     @Transactional
     @Override
     public void saveWithDish(SetmealDto setmealDto) {
@@ -65,5 +67,23 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal>imple
         setmealDishService.remove(queryWrapper1);
 
 
+    }
+
+    /**
+     * 根据id获取setmealDto
+     * @param id
+     * @return
+     */
+    @Override
+    public SetmealDto getByWithDishes(Long id) {
+        Setmeal setmeal = this.getById(id);
+        SetmealDto setmealDto = new SetmealDto();
+        BeanUtils.copyProperties(setmeal,setmealDto);
+
+        LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SetmealDish::getSetmealId,id);
+        List<SetmealDish> setmealDishList = setmealDishService.list(queryWrapper);
+        setmealDto.setSetmealDishes(setmealDishList);
+        return setmealDto;
     }
 }

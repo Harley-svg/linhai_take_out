@@ -22,4 +22,11 @@ public interface SetmealService extends IService<Setmeal> {
      * @param list
      */
     void removeWithDish(List<Long> list);
+
+    /**
+     * 根据id获取套餐菜品
+     * @param id
+     * @return
+     */
+    SetmealDto getByWithDishes(Long id);
 }
